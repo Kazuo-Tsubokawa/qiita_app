@@ -1,0 +1,12 @@
+メソッド URI HTTP1.1
+ホスト ドメイン 
+
+### 一覧取得
+GET /api/v2/tags/PHP/items HTTP/1.1
+Host: qiita.com
+Authorization: Bearer ce50bb442816883dc06e809eec72612460f1e79f
+
+### 詳細取得
+GET /api/v2/items/6931d873738b71dd7959 HTTP/1.1
+Host: qiita.com
+Authorization: Bearer ce50bb442816883dc06e809eec72612460f1e79f
