@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class ArticleController extends Controller
 {
@@ -22,7 +24,7 @@ class ArticleController extends Controller
         // https://qiita.com/api/v2/tags/XXXX/items
         $options = [
             'headers' => [
-                'Authorization' => 'Bearer ' . config('qiita.token'),
+                'Authorization' => 'Bearer ' . $this->getToken(),
             ],
         ];
         $client = new Client();
@@ -42,7 +44,7 @@ class ArticleController extends Controller
         // https://qiita.com/api/v2/authenticated_user/items
         $options = [
             'headers' => [
-                'Authorization' => 'Bearer ' . config('qiita.token'),
+                'Authorization' => 'Bearer ' . $this->getToken(),
             ],
         ];
         $client = new Client();
@@ -99,7 +101,7 @@ class ArticleController extends Controller
         $options = [
             'headers' => [
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . config('qiita.token'),
+                'Authorization' => 'Bearer ' . $this->getToken(),
             ],
             'json' => $data,
         ];
@@ -114,7 +116,8 @@ class ArticleController extends Controller
             return back()->withErrors(['error' => '投稿に失敗しました！']);
         }
         $message = new \Illuminate\Support\HtmlString;
-        return redirect()->route('articles.index');
+        return redirect()->route('articles.index')
+        ->with('flash_message', $message);
     }
 
     /**
@@ -130,7 +133,7 @@ class ArticleController extends Controller
         $url = config('qiita.url') . '/api/v2/items/' . $id;
         $options = [
             'headers' => [
-                'Authorization' => 'Bearer ' . config('qiita.token'),
+                'Authorization' => 'Bearer ' . $this->getToken(),
             ],
         ];
         $client = new Client();
@@ -158,7 +161,7 @@ class ArticleController extends Controller
         // $optionsにトークンを指定
         $options = [
             'headers' => [
-                'Authorization' => 'Bearer ' . config('qiita.token'),
+                'Authorization' => 'Bearer ' . $this->getToken(),
             ],
         ];
 
@@ -190,7 +193,7 @@ class ArticleController extends Controller
         $url = config('qiita.url') . '/api/v2/items/' . $id;
         $options = [
             'headers' => [
-                'Authorization' => 'Bearer ' . config('qiita.token'),
+                'Authorization' => 'Bearer ' . $this->getToken(),
             ],
         ];
         $client = new Client();
@@ -239,7 +242,7 @@ class ArticleController extends Controller
         $options = [
             'headers' => [
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . config('qiita.token'),
+                'Authorization' => 'Bearer ' . $this->getToken(),
             ],
             'json' => $data,
         ];
@@ -284,5 +287,10 @@ class ArticleController extends Controller
         }
 
         return redirect()->route('articles.index')->with('flash_message', '記事を削除しました');;
+    }
+
+    protected function getToken()
+    {
+        return Crypt::decryptString(Auth::User()->token);
     }
 }
